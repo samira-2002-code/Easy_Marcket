@@ -8,9 +8,57 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'user'])->latest()->get();
+        $query = Product::with(['category', 'user']);
+
+        // Recherche
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtre par catégorie
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Prix minimum
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        // Prix maximum
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Tri
+        $sort = $request->get('sort', 'latest');
+
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+
+            default:
+                $query->latest();
+                break;
+        }
+
+        $products = $query->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -43,7 +91,7 @@ class ProductController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $product->load(['category', 'user'])
+            'data' => $product->load(['category', 'user', 'images'])
         ]);
     }
 
@@ -62,7 +110,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Produit modifié avec succès.',
-            'data' => $product
+            'data' => $product->load(['category', 'user', 'images'])
         ]);
     }
 
