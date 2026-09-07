@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\UserController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -39,4 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/images/{image}', [ImageController::class, 'update']);
     Route::patch('/images/{image}', [ImageController::class, 'update']);
     Route::delete('/images/{image}', [ImageController::class, 'destroy']);
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::put('/profile', [UserController::class, 'updateProfile']);
 });
