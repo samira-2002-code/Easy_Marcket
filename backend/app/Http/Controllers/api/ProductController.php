@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::with(['category', 'user'])->latest()->get();
 
         return response()->json([
             'success' => true,
@@ -22,17 +22,19 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|string',
         ]);
 
+        $validated['user_id'] = $request->user()->id;
+
         $product = Product::create($validated);
 
         return response()->json([
             'success' => true,
+            'message' => 'Produit créé avec succès.',
             'data' => $product
         ], 201);
     }
@@ -41,7 +43,7 @@ class ProductController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $product->load('category')
+            'data' => $product->load(['category', 'user'])
         ]);
     }
 
@@ -49,7 +51,6 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
@@ -60,6 +61,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'Produit modifié avec succès.',
             'data' => $product
         ]);
     }
@@ -70,7 +72,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Product deleted successfully'
+            'message' => 'Produit supprimé avec succès.'
         ]);
     }
 }

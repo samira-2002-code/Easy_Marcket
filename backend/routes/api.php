@@ -5,9 +5,8 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ImageController;
 
-
+// Auth
 Route::post('/register', [AuthController::class, 'register']);
-
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->post(
@@ -15,8 +14,29 @@ Route::middleware('auth:sanctum')->post(
     [AuthController::class, 'logout']
 );
 
+// Categories
 Route::apiResource('categories', CategoryController::class);
 
-Route::apiResource('products', ProductController::class);
+// Products
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product}', [ProductController::class, 'show']);
 
-Route::apiResource('images', ImageController::class);
+// Images publiques en lecture
+Route::get('/images', [ImageController::class, 'index']);
+Route::get('/images/{image}', [ImageController::class, 'show']);
+
+// Actions protégées
+Route::middleware('auth:sanctum')->group(function () {
+
+    // Products
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{product}', [ProductController::class, 'update']);
+    Route::patch('/products/{product}', [ProductController::class, 'update']);
+    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+    // Images
+    Route::post('/images', [ImageController::class, 'store']);
+    Route::put('/images/{image}', [ImageController::class, 'update']);
+    Route::patch('/images/{image}', [ImageController::class, 'update']);
+    Route::delete('/images/{image}', [ImageController::class, 'destroy']);
+});

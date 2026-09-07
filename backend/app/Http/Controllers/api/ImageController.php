@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
@@ -22,10 +23,15 @@ class ImageController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'image' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $image = Image::create($validated);
+        $path = $request->file('image')->store('products', 'public');
+
+        $image = Image::create([
+            'product_id' => $validated['product_id'],
+            'image' => $path,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -46,10 +52,19 @@ class ImageController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'image' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $image->update($validated);
+        if ($request->hasFile('image')) {
+            if (Storage::disk('public')->exists($image->image)) {
+                Storage::disk('public')->delete($image->image);
+            }
+
+            $image->image = $request->file('image')->store('products', 'public');
+        }
+
+        $image->product_id = $validated['product_id'];
+        $image->save();
 
         return response()->json([
             'success' => true,
@@ -60,6 +75,10 @@ class ImageController extends Controller
 
     public function destroy(Image $image)
     {
+        if (Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+
         $image->delete();
 
         return response()->json([
@@ -68,4 +87,3 @@ class ImageController extends Controller
         ]);
     }
 }
-
