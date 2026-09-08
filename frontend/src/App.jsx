@@ -44,9 +44,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Unknown route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
+      {/* Create Product */}
       <Route
         path="/products/create"
         element={
@@ -55,9 +53,10 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* Unknown route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-
-
   );
 }
 
