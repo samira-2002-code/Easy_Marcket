@@ -1,31 +1,72 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import CreateProduct from "./pages/CreateProduct";
 
-function Home() {
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function AppRoutes() {
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Easy Market</h1>
-      <p>Home page — nous allons la construire ensuite.</p>
-    </div>
+    <Routes>
+      {/* Auth */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Home */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Products */}
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <Products />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Unknown route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route
+        path="/products/create"
+        element={
+          <ProtectedRoute>
+            <CreateProduct />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+
+
   );
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   );
 }
-
-export default App;

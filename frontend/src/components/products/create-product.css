@@ -1,0 +1,260 @@
+.create-product-page {
+    min-height: calc(100vh - 76px);
+    padding: 35px 8% 100px;
+}
+
+.create-product-top {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c9c6bc;
+}
+
+.create-product-top a {
+    color: #252c25;
+    font-size: 10px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.create-product-top span {
+    color: #858a82;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+}
+
+.create-product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 60px;
+    padding: 65px 0 55px;
+}
+
+.create-eyebrow {
+    color: #68764f;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+}
+
+.create-product-header h1 {
+    margin: 18px 0 0;
+    font-size: clamp(65px, 8vw, 105px);
+    line-height: 0.82;
+    letter-spacing: -0.08em;
+}
+
+.create-product-header h1 em {
+    color: #65764d;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+}
+
+.create-product-header > p {
+    max-width: 290px;
+    margin: 0;
+    color: #777d74;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.create-product-error {
+    margin-bottom: 25px;
+    padding: 14px 18px;
+    border: 1px solid #d8bcbc;
+    background: #fff5f5;
+    color: #934747;
+    font-size: 11px;
+}
+
+.create-product-form {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 8%;
+    padding-top: 25px;
+    border-top: 1px solid #c9c6bc;
+}
+
+.form-section-number {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.form-section-number span {
+    color: #9a9f96;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.form-section-number strong {
+    color: #444b43;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+}
+
+.create-field {
+    margin-bottom: 30px;
+}
+
+.create-field label {
+    display: block;
+    margin-bottom: 9px;
+    color: #535a51;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.create-field input,
+.create-field textarea,
+.create-field select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cbc8be;
+    outline: none;
+    background: #f8f6ef;
+    color: #1e271f;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.create-field input,
+.create-field select {
+    height: 50px;
+    padding: 0 15px;
+}
+
+.create-field textarea {
+    padding: 15px;
+    resize: vertical;
+    line-height: 1.7;
+}
+
+.create-field input:focus,
+.create-field textarea:focus,
+.create-field select:focus {
+    border-color: #65764d;
+}
+
+.create-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.image-upload {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 390px;
+    border: 1px dashed #aeb3a9;
+    background: #eeece3;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.image-upload:hover {
+    border-color: #65764d;
+}
+
+.image-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.upload-symbol {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 1px solid #aeb3a9;
+    border-radius: 50%;
+    color: #65764d;
+    font-size: 25px;
+    font-weight: 300;
+}
+
+.image-upload-content strong {
+    color: #313931;
+    font-size: 12px;
+}
+
+.image-upload-content small {
+    margin-top: 7px;
+    color: #898e86;
+    font-size: 9px;
+}
+
+.image-upload.has-image img {
+    width: 100%;
+    height: 390px;
+    object-fit: cover;
+}
+
+.publish-product-button {
+    width: 100%;
+    height: 58px;
+    margin-top: 25px;
+    border: 0;
+    background: #1d3024;
+    color: #f6f3ea;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+}
+
+.publish-product-button:hover {
+    background: #304536;
+}
+
+.publish-product-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.publish-note {
+    margin: 13px 0 0;
+    color: #898e86;
+    font-size: 9px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+@media (max-width: 850px) {
+    .create-product-form {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .create-product-header {
+        flex-direction: column;
+        align-items: start;
+    }
+}
+
+@media (max-width: 600px) {
+    .create-product-page {
+        padding-left: 6%;
+        padding-right: 6%;
+    }
+
+    .create-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .image-upload,
+    .image-upload.has-image img {
+        min-height: 300px;
+        height: 300px;
+    }
+}
