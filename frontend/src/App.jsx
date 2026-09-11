@@ -6,6 +6,8 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import CreateProduct from "./pages/CreateProduct";
+import Profile from "./pages/Profile";
+import ProductDetails from "./pages/ProductDetails";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -50,6 +52,24 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <CreateProduct />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products/:id"
+        element={
+          <ProtectedRoute>
+            <ProductDetails />
           </ProtectedRoute>
         }
       />
