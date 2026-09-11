@@ -17,6 +17,7 @@ export default function CreateProduct() {
         description: "",
         price: "",
         category_id: "",
+        type: "sale",
     });
 
     const [image, setImage] = useState(null);
@@ -80,16 +81,13 @@ export default function CreateProduct() {
             formData.append("description", form.description);
             formData.append("price", form.price);
             formData.append("category_id", form.category_id);
+            formData.append("type", form.type);
 
             if (image) {
                 formData.append("image", image);
             }
 
-            await api.post("/products", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            await api.post("/products", formData);
 
             navigate("/products");
         } catch (err) {
@@ -247,6 +245,28 @@ export default function CreateProduct() {
                                 </select>
                             </div>
 
+                        </div>
+
+                        <div className="create-field">
+                            <label htmlFor="type">
+                                Listing type
+                            </label>
+
+                            <select
+                                id="type"
+                                name="type"
+                                value={form.type}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="sale">
+                                    Sale
+                                </option>
+
+                                <option value="exchange">
+                                    Exchange
+                                </option>
+                            </select>
                         </div>
 
                     </div>
