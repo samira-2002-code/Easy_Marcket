@@ -13,7 +13,12 @@ class Product extends Model
         'title',
         'description',
         'price',
+        'type',
         'image',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
     ];
 
     public function category()
