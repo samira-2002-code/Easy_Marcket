@@ -83,17 +83,25 @@ class ProductController extends Controller
                 'required',
                 Rule::in(['sale', 'exchange']),
             ],
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $validated['user_id'] = $request->user()->id;
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
 
         $product = Product::create($validated);
 
         return response()->json([
             'success' => true,
             'message' => 'Produit créé avec succès.',
-            'data' => $product->load(['category', 'user'])
+            'data' => $product->load([
+                'category',
+                'user',
+                'images'
+            ])
         ], 201);
     }
 
