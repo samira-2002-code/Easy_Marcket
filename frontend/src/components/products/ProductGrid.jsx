@@ -1,6 +1,6 @@
 import ProductCard from "../home/ProductCard";
 
-export default function ProductGrid({ products }) {
+export default function ProductGrid({ products, onDelete }) {
   if (products.length === 0) {
     return (
       <div className="products-empty">
@@ -21,6 +21,7 @@ export default function ProductGrid({ products }) {
         <ProductCard
           key={product.id}
           product={product}
+          onDelete={onDelete}
         />
       ))}
     </div>

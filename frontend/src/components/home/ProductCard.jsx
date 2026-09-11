@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
+import api from "../../services/api";
 
-export default function ProductCard({ product, featured = false }) {
+export default function ProductCard({ product, featured = false, onDelete }) {
   const getImageUrl = () => {
     if (!product.image) {
       return null;
@@ -15,6 +16,31 @@ export default function ProductCard({ product, featured = false }) {
     }
 
     return null;
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "Voulez-vous vraiment supprimer cette annonce ?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await api.delete(`/products/${product.id}`);
+
+      if (onDelete) {
+        onDelete(product.id);
+      }
+    } catch (err) {
+      console.error("Delete product error:", err);
+
+      alert(
+        err.response?.data?.message ||
+          "Impossible de supprimer cette annonce."
+      );
+    }
   };
 
   const imageUrl = getImageUrl();
@@ -85,6 +111,14 @@ export default function ProductCard({ product, featured = false }) {
           <Link to={`/products/${product.id}`}>
             View item →
           </Link>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="product-delete"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </article>

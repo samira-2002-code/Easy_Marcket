@@ -38,7 +38,9 @@ export default function Products() {
                     setProducts(data.data.data);
                 } else {
                     setProducts([]);
-                    setError("The products API did not return a valid list.");
+                    setError(
+                        "The products API did not return a valid list."
+                    );
                 }
             } catch (err) {
                 console.error("Products error:", err);
@@ -56,8 +58,18 @@ export default function Products() {
         fetchProducts();
     }, []);
 
+    const handleDelete = (productId) => {
+        setProducts((currentProducts) =>
+            currentProducts.filter(
+                (product) => product.id !== productId
+            )
+        );
+    };
+
     const filteredProducts = useMemo(() => {
-        let result = Array.isArray(products) ? [...products] : [];
+        let result = Array.isArray(products)
+            ? [...products]
+            : [];
 
         if (search.trim()) {
             const keyword = search.toLowerCase();
@@ -78,14 +90,16 @@ export default function Products() {
         if (sort === "price_asc") {
             result.sort(
                 (a, b) =>
-                    Number(a.price || 0) - Number(b.price || 0)
+                    Number(a.price || 0) -
+                    Number(b.price || 0)
             );
         }
 
         if (sort === "price_desc") {
             result.sort(
                 (a, b) =>
-                    Number(b.price || 0) - Number(a.price || 0)
+                    Number(b.price || 0) -
+                    Number(a.price || 0)
             );
         }
 
@@ -105,13 +119,16 @@ export default function Products() {
             <Navbar />
 
             <main className="products-page">
+
                 <section className="products-intro">
+
                     <div className="section-topline">
                         <span>02</span>
                         <span>MARKETPLACE</span>
                     </div>
 
                     <div className="products-intro-content">
+
                         <div>
                             <span className="products-eyebrow">
                                 DISCOVER SOMETHING NEW
@@ -125,6 +142,7 @@ export default function Products() {
                         </div>
 
                         <div className="products-intro-side">
+
                             <p>
                                 Explore everything currently listed
                                 on Easy Market.
@@ -133,11 +151,15 @@ export default function Products() {
                             <Link to="/products/create">
                                 Sell an item →
                             </Link>
+
                         </div>
+
                     </div>
+
                 </section>
 
                 <section className="products-content">
+
                     <ProductFilters
                         search={search}
                         setSearch={setSearch}
@@ -148,6 +170,7 @@ export default function Products() {
                     />
 
                     <div className="products-result-info">
+
                         <span>
                             {loading
                                 ? "Loading..."
@@ -161,12 +184,16 @@ export default function Products() {
                                     : "All listings"}
                             </span>
                         )}
+
                     </div>
 
                     {loading && (
                         <div className="products-empty">
                             <span>...</span>
-                            <h3>Loading marketplace.</h3>
+
+                            <h3>
+                                Loading marketplace.
+                            </h3>
                         </div>
                     )}
 
@@ -177,9 +204,14 @@ export default function Products() {
                     )}
 
                     {!loading && !error && (
-                        <ProductGrid products={filteredProducts} />
+                        <ProductGrid
+                            products={filteredProducts}
+                            onDelete={handleDelete}
+                        />
                     )}
+
                 </section>
+
             </main>
         </div>
     );
