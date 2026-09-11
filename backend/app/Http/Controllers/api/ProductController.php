@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -18,13 +19,18 @@ class ProductController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         // Filtre par catégorie
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
+        }
+
+        // Filtre par type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
         }
 
         // Prix minimum
@@ -73,6 +79,10 @@ class ProductController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'type' => [
+                'required',
+                Rule::in(['sale', 'exchange']),
+            ],
             'image' => 'nullable|string',
         ]);
 
@@ -83,7 +93,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Produit créé avec succès.',
-            'data' => $product
+            'data' => $product->load(['category', 'user'])
         ], 201);
     }
 
@@ -91,17 +101,32 @@ class ProductController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $product->load(['category', 'user', 'images'])
+            'data' => $product->load([
+                'category',
+                'user',
+                'images'
+            ])
         ]);
     }
 
     public function update(Request $request, Product $product)
     {
+        if ($product->user_id !== $request->user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous ne pouvez modifier que vos propres annonces.'
+            ], 403);
+        }
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'type' => [
+                'required',
+                Rule::in(['sale', 'exchange']),
+            ],
             'image' => 'nullable|string',
         ]);
 
@@ -110,12 +135,23 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Produit modifié avec succès.',
-            'data' => $product->load(['category', 'user', 'images'])
+            'data' => $product->load([
+                'category',
+                'user',
+                'images'
+            ])
         ]);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
+        if ($product->user_id !== $request->user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous ne pouvez supprimer que vos propres annonces.'
+            ], 403);
+        }
+
         $product->delete();
 
         return response()->json([
