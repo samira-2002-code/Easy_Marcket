@@ -885,3 +885,24 @@
     height: 300px;
   }
 }
+
+.product-save {
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease;
+}
+
+.product-save:hover {
+    transform: scale(1.08);
+}
+
+.product-save.is-favorite {
+    background: #d8e99e;
+    color: #172019;
+}
+
+.product-save:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
