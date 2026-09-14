@@ -1,7 +1,15 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
-export default function ProductCard({ product, featured = false, onDelete }) {
+export default function ProductCard({
+  product,
+  featured = false,
+}) {
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
   const getImageUrl = () => {
     if (!product.image) {
       return null;
@@ -18,32 +26,65 @@ export default function ProductCard({ product, featured = false, onDelete }) {
     return null;
   };
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Voulez-vous vraiment supprimer cette annonce ?"
-    );
+  const imageUrl = getImageUrl();
 
-    if (!confirmed) {
+  useEffect(() => {
+    const checkFavorite = async () => {
+      try {
+        const response = await api.get("/favorites");
+
+        const favorites = response.data.data || [];
+
+        const favorite = favorites.find(
+          (item) => item.product_id === product.id
+        );
+
+        if (favorite) {
+          setIsFavorite(true);
+          setFavoriteId(favorite.id);
+        }
+      } catch (error) {
+        console.error("Check favorite error:", error);
+      }
+    };
+
+    checkFavorite();
+  }, [product.id]);
+
+  const handleFavorite = async () => {
+    if (favoriteLoading) {
       return;
     }
 
     try {
-      await api.delete(`/products/${product.id}`);
+      setFavoriteLoading(true);
 
-      if (onDelete) {
-        onDelete(product.id);
+      if (isFavorite && favoriteId) {
+        await api.delete(`/favorites/${favoriteId}`);
+
+        setIsFavorite(false);
+        setFavoriteId(null);
+      } else {
+        const response = await api.post("/favorites", {
+          product_id: product.id,
+        });
+
+        const favorite = response.data.data;
+
+        setIsFavorite(true);
+        setFavoriteId(favorite.id);
       }
-    } catch (err) {
-      console.error("Delete product error:", err);
+    } catch (error) {
+      console.error("Favorite error:", error);
 
       alert(
-        err.response?.data?.message ||
-          "Impossible de supprimer cette annonce."
+        error.response?.data?.message ||
+          "Impossible de modifier ce favori."
       );
+    } finally {
+      setFavoriteLoading(false);
     }
   };
-
-  const imageUrl = getImageUrl();
 
   return (
     <article
@@ -66,9 +107,15 @@ export default function ProductCard({ product, featured = false, onDelete }) {
         <button
           type="button"
           className="product-save"
-          aria-label="Save product"
+          onClick={handleFavorite}
+          disabled={favoriteLoading}
+          aria-label={
+            isFavorite
+              ? "Remove from favorites"
+              : "Add to favorites"
+          }
         >
-          ♡
+          {isFavorite ? "♥" : "♡"}
         </button>
 
         {product.type && (
@@ -111,14 +158,6 @@ export default function ProductCard({ product, featured = false, onDelete }) {
           <Link to={`/products/${product.id}`}>
             View item →
           </Link>
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="product-delete"
-          >
-            Delete
-          </button>
         </div>
       </div>
     </article>
