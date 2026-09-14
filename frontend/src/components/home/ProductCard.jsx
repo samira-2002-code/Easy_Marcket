@@ -1,92 +1,187 @@
+import { useEffect, useState } from "react";
+import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import api from "../../services/api";
 
-export default function ProductCard({ product, featured = false }) {
-  const getImageUrl = () => {
-    if (!product.image) {
-      return null;
-    }
+export default function ProductCard({
+    product,
+    featured = false,
+}) {
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteId, setFavoriteId] = useState(null);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
 
-    if (typeof product.image === "string") {
-      if (product.image.startsWith("http")) {
-        return product.image;
-      }
+    const getImageUrl = () => {
+        if (!product?.image) {
+            return null;
+        }
 
-      return `http://127.0.0.1:8000/storage/${product.image}`;
-    }
+        if (typeof product.image === "string") {
+            if (product.image.startsWith("http")) {
+                return product.image;
+            }
 
-    return null;
-  };
+            return `http://127.0.0.1:8000/storage/${product.image}`;
+        }
 
-  const imageUrl = getImageUrl();
+        return null;
+    };
 
-  return (
-    <article
-      className={`editorial-product-card ${
-        featured ? "featured-product" : ""
-      }`}
-    >
-      <div className="product-visual">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={product.title || "Product"}
-          />
-        ) : (
-          <div className="product-empty-image">
-            <span>NO IMAGE</span>
-          </div>
-        )}
+    const imageUrl = getImageUrl();
 
-        <button
-          type="button"
-          className="product-save"
-          aria-label="Save product"
+    useEffect(() => {
+        const checkFavorite = async () => {
+            try {
+                const response = await api.get("/favorites");
+
+                const favorites = response.data?.data || [];
+
+                const favorite = favorites.find(
+                    (item) =>
+                        String(item.product_id) ===
+                        String(product.id)
+                );
+
+                if (favorite) {
+                    setIsFavorite(true);
+                    setFavoriteId(favorite.id);
+                } else {
+                    setIsFavorite(false);
+                    setFavoriteId(null);
+                }
+            } catch (error) {
+                console.error("Check favorite error:", error);
+            }
+        };
+
+        if (product?.id) {
+            checkFavorite();
+        }
+    }, [product?.id]);
+
+    const handleFavorite = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (favoriteLoading) {
+            return;
+        }
+
+        try {
+            setFavoriteLoading(true);
+
+            if (isFavorite && favoriteId) {
+                await api.delete(`/favorites/${favoriteId}`);
+
+                setIsFavorite(false);
+                setFavoriteId(null);
+
+                return;
+            }
+
+            const response = await api.post("/favorites", {
+                product_id: product.id,
+            });
+
+            const favorite = response.data?.data;
+
+            setIsFavorite(true);
+            setFavoriteId(favorite?.id || null);
+        } catch (error) {
+            console.error("Favorite error:", error);
+
+            alert(
+                error.response?.data?.message ||
+                    "Impossible de modifier ce favori."
+            );
+        } finally {
+            setFavoriteLoading(false);
+        }
+    };
+
+    return (
+        <article
+            className={`editorial-product-card ${
+                featured ? "featured-product" : ""
+            }`}
         >
-          ♡
-        </button>
+            <div className="product-visual">
+                {imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt={product.title || "Product"}
+                    />
+                ) : (
+                    <div className="product-empty-image">
+                        <span>NO IMAGE</span>
+                    </div>
+                )}
 
-        {product.type && (
-          <span className="product-badge">
-            {product.type}
-          </span>
-        )}
+                <button
+                    type="button"
+                    className={`product-save ${
+                        isFavorite ? "is-favorite" : ""
+                    }`}
+                    onClick={handleFavorite}
+                    disabled={favoriteLoading}
+                    aria-label={
+                        isFavorite
+                            ? "Remove from favorites"
+                            : "Add to favorites"
+                    }
+                >
+                    <Heart
+                        size={18}
+                        strokeWidth={1.8}
+                        fill={isFavorite ? "currentColor" : "none"}
+                    />
+                </button>
 
-        <span className="product-number">
-          #{String(product.id).padStart(3, "0")}
-        </span>
-      </div>
+                {product.type && (
+                    <span className="product-badge">
+                        {product.type}
+                    </span>
+                )}
 
-      <div className="product-details">
-        <div className="product-category-line">
-          <span>
-            {product.category?.name || "Marketplace"}
-          </span>
+                <span className="product-number">
+                    #{String(product.id).padStart(3, "0")}
+                </span>
+            </div>
 
-          {product.created_at && (
-            <span>
-              {new Date(product.created_at).toLocaleDateString(
-                "fr-FR"
-              )}
-            </span>
-          )}
-        </div>
+            <div className="product-details">
+                <div className="product-category-line">
+                    <span>
+                        {product.category?.name ||
+                            "Marketplace"}
+                    </span>
 
-        <h3>{product.title}</h3>
+                    {product.created_at && (
+                        <span>
+                            {new Date(
+                                product.created_at
+                            ).toLocaleDateString("fr-FR")}
+                        </span>
+                    )}
+                </div>
 
-        <div className="product-footer">
-          <strong>
-            {product.price
-              ? `${Number(product.price).toLocaleString(
-                  "fr-FR"
-                )} DH`
-              : "Exchange"}
-          </strong>
+                <h3>{product.title}</h3>
 
-          <Link to={`/products/${product.id}`}>
-            View item →
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
+                <div className="product-footer">
+                    <strong>
+                        {product.type === "exchange"
+                            ? "Exchange"
+                            : product.price
+                            ? `${Number(
+                                  product.price
+                              ).toLocaleString("fr-FR")} DH`
+                            : "Price on request"}
+                    </strong>
+
+                    <Link to={`/products/${product.id}`}>
+                        View item →
+                    </Link>
+                </div>
+            </div>
+        </article>
+    );
 }

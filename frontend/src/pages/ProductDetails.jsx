@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Heart, MessageCircle } from "lucide-react";
+import {
+    ArrowLeft,
+    Heart,
+    MessageCircle,
+    X,
+    ArrowUpRight,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import api from "../services/api";
@@ -15,6 +21,14 @@ export default function ProductDetails() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+    const [showContact, setShowContact] = useState(false);
+    const [message, setMessage] = useState("");
+    const [sending, setSending] = useState(false);
+    const [messageSuccess, setMessageSuccess] = useState("");
+    const [messageError, setMessageError] = useState("");
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -69,6 +83,79 @@ export default function ProductDetails() {
         return `${Number(product.price).toLocaleString("fr-FR")} DH`;
     };
 
+    const handleContactSeller = () => {
+        setShowContact(true);
+        setMessage("");
+        setMessageSuccess("");
+        setMessageError("");
+    };
+
+    const closeContact = () => {
+        if (sending) {
+            return;
+        }
+
+        setShowContact(false);
+        setMessageError("");
+        setMessageSuccess("");
+    };
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+
+        if (!message.trim()) {
+            setMessageError("Write a message before sending.");
+            return;
+        }
+
+        try {
+            setSending(true);
+            setMessageError("");
+            setMessageSuccess("");
+
+            await api.post("/messages", {
+                product_id: product.id,
+                message: message.trim(),
+            });
+
+            setMessage("");
+            setMessageSuccess("Message sent successfully.");
+        } catch (err) {
+            console.error("Send message error:", err);
+
+            setMessageError(
+                err.response?.data?.message ||
+                "Unable to send your message."
+            );
+        } finally {
+            setSending(false);
+        }
+
+    };
+    const handleFavorite = async () => {
+        try {
+            setFavoriteLoading(true);
+
+            if (isFavorite) {
+                await api.delete(`/favorites/${product.id}`);
+                setIsFavorite(false);
+            } else {
+                await api.post("/favorites", {
+                    product_id: product.id,
+                });
+                setIsFavorite(true);
+            }
+        } catch (err) {
+            console.error("Favorite error:", err);
+
+            console.error(
+                err.response?.data || err.message
+            );
+        } finally {
+            setFavoriteLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="market-home">
@@ -116,11 +203,13 @@ export default function ProductDetails() {
 
     return (
         <div className="market-home">
+
             <Navbar />
 
             <main className="product-details-page">
 
                 <section className="product-details-top">
+
                     <Link
                         to="/products"
                         className="product-details-back"
@@ -139,6 +228,7 @@ export default function ProductDetails() {
                                 "Marketplace"}
                         </span>
                     </div>
+
                 </section>
 
                 <section className="product-details-main">
@@ -161,6 +251,7 @@ export default function ProductDetails() {
                                 {product.type}
                             </span>
                         )}
+
                     </div>
 
                     <div className="product-details-info">
@@ -178,18 +269,22 @@ export default function ProductDetails() {
                         <div className="product-details-line" />
 
                         <div className="product-details-description">
+
                             <span>DESCRIPTION</span>
 
                             <p>
                                 {product.description ||
                                     "No description available for this product."}
                             </p>
+
                         </div>
 
                         <div className="product-details-seller">
+
                             <span>SELLER</span>
 
                             <div className="seller-info">
+
                                 <div className="seller-avatar">
                                     {product.user?.name
                                         ?.charAt(0)
@@ -206,30 +301,45 @@ export default function ProductDetails() {
                                         Easy Market seller
                                     </small>
                                 </div>
+
                             </div>
+
                         </div>
 
                         <div className="product-details-actions">
 
                             <button
                                 type="button"
-                                className="product-details-favorite"
+                                className={`product-details-favorite ${isFavorite ? "active" : ""
+                                    }`}
+                                onClick={handleFavorite}
+                                disabled={favoriteLoading}
                             >
-                                <Heart size={19} />
-                                Add to favorites
+                                <Heart
+                                    size={19}
+                                    fill={isFavorite ? "currentColor" : "none"}
+                                />
+
+                                {favoriteLoading
+                                    ? "Loading..."
+                                    : isFavorite
+                                        ? "Remove from favorites"
+                                        : "Add to favorites"}
                             </button>
 
                             <button
                                 type="button"
                                 className="product-details-contact"
+                                onClick={handleContactSeller}
                             >
-                                <MessageCircle size={19} />
                                 Contact seller
+                                <ArrowUpRight size={18} />
                             </button>
 
                         </div>
 
                     </div>
+
                 </section>
 
                 <section className="product-details-bottom">
@@ -249,10 +359,10 @@ export default function ProductDetails() {
                         <p>
                             {product.created_at
                                 ? new Date(
-                                      product.created_at
-                                  ).toLocaleDateString(
-                                      "fr-FR"
-                                  )
+                                    product.created_at
+                                ).toLocaleDateString(
+                                    "fr-FR"
+                                )
                                 : "—"}
                         </p>
                     </div>
@@ -261,13 +371,180 @@ export default function ProductDetails() {
                         <span>03</span>
                         <strong>Type</strong>
                         <p>
-                            {product.type ||
-                                "Sale"}
+                            {product.type || "Sale"}
                         </p>
                     </div>
 
                 </section>
+
             </main>
+
+            {showContact && (
+                <>
+
+                    <div
+                        className="contact-overlay"
+                        onClick={closeContact}
+                    />
+
+                    <aside className="contact-drawer">
+
+                        <div className="contact-drawer-top">
+
+                            <span>
+                                EASY MARKET / CONTACT
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={closeContact}
+                                disabled={sending}
+                                aria-label="Close contact panel"
+                            >
+                                <X size={22} />
+                            </button>
+
+                        </div>
+
+                        <div className="contact-drawer-heading">
+
+                            <span>MESSAGE 01</span>
+
+                            <h2>
+                                Let's
+                                <br />
+                                <em>talk.</em>
+                            </h2>
+
+                            <p>
+                                Ask the seller about this
+                                listing, its condition,
+                                availability or anything else.
+                            </p>
+
+                        </div>
+
+                        <div className="contact-product-preview">
+
+                            <div className="contact-product-image">
+
+                                {imageUrl ? (
+                                    <img
+                                        src={imageUrl}
+                                        alt={product.title}
+                                    />
+                                ) : (
+                                    <span>
+                                        NO IMAGE
+                                    </span>
+                                )}
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    {product.category?.name ||
+                                        "MARKETPLACE"}
+                                </span>
+
+                                <strong>
+                                    {product.title}
+                                </strong>
+
+                                <small>
+                                    {formatPrice()}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div className="contact-seller-preview">
+
+                            <span>YOU ARE CONTACTING</span>
+
+                            <strong>
+                                {product.user?.name ||
+                                    "Unknown seller"}
+                            </strong>
+
+                        </div>
+
+                        <form
+                            className="contact-drawer-form"
+                            onSubmit={handleSendMessage}
+                        >
+
+                            <label htmlFor="seller-message">
+                                YOUR MESSAGE
+                            </label>
+
+                            <textarea
+                                id="seller-message"
+                                value={message}
+                                onChange={(e) =>
+                                    setMessage(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="Hi, I'm interested in this item..."
+                                maxLength="2000"
+                                rows="7"
+                                autoFocus
+                            />
+
+                            <div className="contact-character-count">
+                                {message.length} / 2000
+                            </div>
+
+                            {messageError && (
+                                <div className="contact-form-error">
+                                    {messageError}
+                                </div>
+                            )}
+
+                            {messageSuccess && (
+                                <div className="contact-form-success">
+                                    <span>✓</span>
+                                    {messageSuccess}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="contact-send-button"
+                                disabled={sending}
+                            >
+                                <span>
+                                    {sending
+                                        ? "Sending..."
+                                        : "Send message"}
+                                </span>
+
+                                {!sending && (
+                                    <ArrowUpRight size={20} />
+                                )}
+                            </button>
+
+                        </form>
+
+                        <div className="contact-drawer-footer">
+                            <span>
+                                EASY MARKET
+                            </span>
+
+                            <span>
+                                BUY / SELL / EXCHANGE
+                            </span>
+                        </div>
+
+                    </aside>
+
+                </>
+            )}
+
         </div>
     );
 }
+

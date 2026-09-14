@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\MessageController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -50,4 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy']);
+    
+    // Messages
+    Route::get('/messages', [MessageController::class, 'index']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::get('/messages/{message}', [MessageController::class, 'show']);
 });
