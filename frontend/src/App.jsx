@@ -8,6 +8,7 @@ import Products from "./pages/Products";
 import CreateProduct from "./pages/CreateProduct";
 import Profile from "./pages/Profile";
 import ProductDetails from "./pages/ProductDetails";
+import Categories from "./pages/Categories";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -70,6 +71,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProductDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/categories"
+        element={
+          <ProtectedRoute>
+            <Categories />
           </ProtectedRoute>
         }
       />
