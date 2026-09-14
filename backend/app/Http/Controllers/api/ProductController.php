@@ -30,17 +30,28 @@ class ProductController extends Controller
 
         // Filtre par type
         if ($request->filled('type')) {
-            $query->where('type', $request->type);
+            $query->where(
+                'type',
+                $request->type
+            );
         }
 
         // Prix minimum
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where(
+                'price',
+                '>=',
+                $request->min_price
+            );
         }
 
         // Prix maximum
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where(
+                'price',
+                '<=',
+                $request->max_price
+            );
         }
 
         // Tri
@@ -89,7 +100,11 @@ class ProductController extends Controller
         $validated['user_id'] = $request->user()->id;
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
+            $validated['image'] = $request
+                ->file('image')
+                ->store('products', 'public');
+        } else {
+            $validated['image'] = null;
         }
 
         $product = Product::create($validated);
@@ -119,6 +134,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        // Vérifier que l'utilisateur est propriétaire
         if ($product->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
@@ -153,6 +169,7 @@ class ProductController extends Controller
 
     public function destroy(Request $request, Product $product)
     {
+        // Vérifier que l'utilisateur est propriétaire
         if ($product->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
