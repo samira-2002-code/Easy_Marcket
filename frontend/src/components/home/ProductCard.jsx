@@ -3,11 +3,19 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
-export default function ProductCard({ product, featured = false }) {
-  const getImageUrl = () => {
-    if (!product.image) {
-      return null;
-    }
+export default function ProductCard({
+    product,
+    featured = false,
+    onDelete,
+}) {
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteId, setFavoriteId] = useState(null);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+    const getImageUrl = () => {
+        if (!product?.image) {
+            return null;
+        }
 
         if (typeof product.image === "string") {
             if (product.image.startsWith("http")) {
@@ -17,8 +25,8 @@ export default function ProductCard({ product, featured = false }) {
             return `http://127.0.0.1:8000/storage/${product.image}`;
         }
 
-    return null;
-  };
+        return null;
+    };
 
     const imageUrl = getImageUrl();
 
@@ -199,11 +207,21 @@ export default function ProductCard({ product, featured = false }) {
                             : "Price on request"}
                     </strong>
 
-          <Link to={`/products/${product.id}`}>
-            View item →
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
+                    <Link to={`/products/${product.id}`}>
+                        View item →
+                    </Link>
+
+                    {onDelete && (
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            className="product-delete"
+                        >
+                            Delete
+                        </button>
+                    )}
+                </div>
+            </div>
+        </article>
+    );
 }
