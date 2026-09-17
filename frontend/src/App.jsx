@@ -9,6 +9,8 @@ import CreateProduct from "./pages/CreateProduct";
 import Profile from "./pages/Profile";
 import ProductDetails from "./pages/ProductDetails";
 import Messages from "./pages/Messages";
+import Favorites from "./pages/Favorites";
+import Categories from "./pages/Categories";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -83,6 +85,26 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/favorites"
+        element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/categories"
+        element={
+          <ProtectedRoute>
+            <Categories />
+          </ProtectedRoute>
+        }
+      />
+
+
 
       {/* Unknown route */}
       <Route path="*" element={<Navigate to="/" replace />} />
