@@ -18,7 +18,17 @@ Route::middleware('auth:sanctum')->post(
 );
 
 // Categories
-Route::apiResource('categories', CategoryController::class);
+// Categories publiques
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{category}', [CategoryController::class, 'show']);
+
+// Gestion des catégories réservée à l'admin
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::patch('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+});
 
 // Products
 Route::get('/products', [ProductController::class, 'index']);
