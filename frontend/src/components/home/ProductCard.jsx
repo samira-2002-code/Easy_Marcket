@@ -179,47 +179,15 @@ export default function ProductCard({
             </div>
 
             <div className="product-details">
-                <div className="product-category-line">
-                    <span>
-                        {product.category?.name ||
-                            "Marketplace"}
-                    </span>
-
-                    {product.created_at && (
-                        <span>
-                            {new Date(
-                                product.created_at
-                            ).toLocaleDateString("fr-FR")}
-                        </span>
-                    )}
+                <div className="product-meta-row">
+                    <span className="product-category-line">{product.category?.name || "Marketplace"}</span>
+                    <span className="product-price">{product.type === "exchange" ? "Exchange" : product.price ? `${Number(product.price).toLocaleString("fr-FR")} DH` : "Price on request"}</span>
                 </div>
-
                 <h3>{product.title}</h3>
-
                 <div className="product-footer">
-                    <strong>
-                        {product.type === "exchange"
-                            ? "Exchange"
-                            : product.price
-                            ? `${Number(
-                                  product.price
-                              ).toLocaleString("fr-FR")} DH`
-                            : "Price on request"}
-                    </strong>
-
-                    <Link to={`/products/${product.id}`}>
-                        View item →
-                    </Link>
-
-                    {onDelete && (
-                        <button
-                            type="button"
-                            onClick={handleDelete}
-                            className="product-delete"
-                        >
-                            Delete
-                        </button>
-                    )}
+                    <span className="product-location">LOCAL LISTING / #{String(product.id).padStart(3, "0")}</span>
+                    <Link to={`/products/${product.id}`}>View item <span>↗</span></Link>
+                    {onDelete && <button type="button" onClick={handleDelete} className="product-delete">Delete</button>}
                 </div>
             </div>
         </article>
