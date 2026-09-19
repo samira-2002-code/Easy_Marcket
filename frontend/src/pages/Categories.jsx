@@ -20,36 +20,35 @@ export default function Categories() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetchCategories();
-    }, []);
+        const loadCategories = async () => {
+            try {
+                setLoading(true);
+                setError("");
 
-    const fetchCategories = async () => {
-        try {
-            setLoading(true);
-            setError("");
+                const response = await api.get("/categories");
+                const data = response.data;
 
-            const response = await api.get("/categories");
+                if (Array.isArray(data)) {
+                    setCategories(data);
+                } else if (Array.isArray(data.data)) {
+                    setCategories(data.data);
+                } else {
+                    setCategories([]);
+                }
+            } catch (err) {
+                console.error("Categories error:", err);
 
-            const data = response.data;
-
-            if (Array.isArray(data)) {
-                setCategories(data);
-            } else if (Array.isArray(data.data)) {
-                setCategories(data.data);
-            } else {
-                setCategories([]);
+                setError(
+                    err.response?.data?.message ||
+                        "Unable to load categories."
+                );
+            } finally {
+                setLoading(false);
             }
-        } catch (err) {
-            console.error("Categories error:", err);
+        };
 
-            setError(
-                err.response?.data?.message ||
-                    "Unable to load categories."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+        loadCategories();
+    }, []);
 
     const resetForm = () => {
         setName("");
@@ -176,7 +175,6 @@ export default function Categories() {
             <Navbar />
 
             <main className="products-page">
-
                 <section className="products-intro">
                     <div className="section-topline">
                         <span>04</span>
@@ -209,171 +207,174 @@ export default function Categories() {
                     </div>
                 </section>
 
-                <section className="products-content">
-
+                <section className="products-content categories-workspace">
                     {error && (
                         <div className="products-error">
                             {error}
                         </div>
                     )}
 
-                    <form
-                        onSubmit={handleSubmit}
-                        style={{
-                            maxWidth: "700px",
-                            marginBottom: "50px",
-                        }}
-                    >
-                        <div className="create-field">
-                            <label htmlFor="category-name">
-                                Category name
-                            </label>
-
-                            <input
-                                id="category-name"
-                                type="text"
-                                value={name}
-                                onChange={(e) =>
-                                    setName(e.target.value)
-                                }
-                                placeholder="e.g. Électronique"
-                                required
-                            />
-                        </div>
-
-                        <div
-                            className="create-field"
-                            style={{
-                                marginTop: "20px",
-                            }}
+                    <div className="categories-layout">
+                        <form
+                            onSubmit={handleSubmit}
+                            className="category-editor"
                         >
-                            <label htmlFor="category-description">
-                                Description
-                            </label>
+                            <div className="category-editor-heading">
+                                <span>EDITOR / 01</span>
 
-                            <textarea
-                                id="category-description"
-                                value={description}
-                                onChange={(e) =>
-                                    setDescription(
-                                        e.target.value
-                                    )
-                                }
-                                placeholder="Describe this category..."
-                                rows="4"
-                            />
-                        </div>
+                                <h2>
+                                    {editingId
+                                        ? "Edit a category"
+                                        : "Shape the market"}
+                                </h2>
 
-                        <div
-                            style={{
-                                display: "flex",
-                                gap: "15px",
-                                marginTop: "20px",
-                            }}
-                        >
-                            <button
-                                type="submit"
-                                className="publish-product-button"
-                                disabled={saving}
-                            >
-                                {saving
-                                    ? "Saving..."
-                                    : editingId
-                                    ? "Update category →"
-                                    : "Add category →"}
-                            </button>
+                                <p>
+                                    Give people a clear way into the
+                                    things they want to find.
+                                </p>
+                            </div>
 
-                            {editingId && (
+                            <div className="create-field">
+                                <label htmlFor="category-name">
+                                    Category name
+                                </label>
+
+                                <input
+                                    id="category-name"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) =>
+                                        setName(e.target.value)
+                                    }
+                                    placeholder="e.g. Électronique"
+                                    required
+                                />
+                            </div>
+
+                            <div className="create-field">
+                                <label htmlFor="category-description">
+                                    Description
+                                </label>
+
+                                <textarea
+                                    id="category-description"
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(
+                                            e.target.value
+                                        )
+                                    }
+                                    placeholder="Describe this category..."
+                                    rows="4"
+                                />
+                            </div>
+
+                            <div className="category-form-actions">
                                 <button
-                                    type="button"
-                                    onClick={resetForm}
+                                    type="submit"
+                                    className="publish-product-button"
+                                    disabled={saving}
                                 >
-                                    Cancel
+                                    {saving
+                                        ? "Saving..."
+                                        : editingId
+                                        ? "Update category →"
+                                        : "Add category →"}
                                 </button>
-                            )}
-                        </div>
-                    </form>
 
-                    {loading ? (
-                        <div className="products-empty">
-                            <span>...</span>
+                                {editingId && (
+                                    <button
+                                        type="button"
+                                        onClick={resetForm}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
+                            </div>
+                        </form>
 
-                            <h3>
-                                Loading categories.
-                            </h3>
-                        </div>
-                    ) : categories.length === 0 ? (
-                        <div className="products-empty">
-                            <span>00</span>
+                        {loading ? (
+                            <div className="products-empty">
+                                <span>...</span>
 
-                            <h3>
-                                No categories yet.
-                            </h3>
+                                <h3>
+                                    Loading categories.
+                                </h3>
+                            </div>
+                        ) : categories.length === 0 ? (
+                            <div className="products-empty">
+                                <span>00</span>
 
-                            <p>
-                                Create your first marketplace
-                                category above.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="products-page-grid">
-                            {categories.map((category) => (
-                                <article
-                                    key={category.id}
-                                    className="editorial-product-card"
-                                >
-                                    <div className="product-details">
-                                        <div className="product-category-line">
-                                            <span>
-                                                CATEGORY #
+                                <h3>
+                                    No categories yet.
+                                </h3>
+
+                                <p>
+                                    Create your first marketplace
+                                    category above.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="categories-list">
+                                {categories.map((category) => (
+                                    <article
+                                        key={category.id}
+                                        className="category-item"
+                                    >
+                                        <div className="product-details">
+                                            <div className="category-item-number">
                                                 {String(
                                                     category.id
-                                                ).padStart(
-                                                    3,
-                                                    "0"
-                                                )}
-                                            </span>
+                                                ).padStart(2, "0")}
+                                            </div>
+
+                                            <div className="category-item-copy">
+                                                <span>
+                                                    CATEGORY
+                                                </span>
+
+                                                <h3>
+                                                    {category.name}
+                                                </h3>
+
+                                                <p>
+                                                    {category.description ||
+                                                        "No description."}
+                                                </p>
+                                            </div>
+
+                                            <div className="category-item-actions">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleEdit(
+                                                            category
+                                                        )
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            category.id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
-
-                                        <h3>
-                                            {category.name}
-                                        </h3>
-
-                                        <p>
-                                            {category.description ||
-                                                "No description."}
-                                        </p>
-
-                                        <div className="product-footer">
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        category
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        category.id
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    )}
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </section>
             </main>
         </div>
     );
 }
+

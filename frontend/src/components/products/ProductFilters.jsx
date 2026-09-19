@@ -30,44 +30,20 @@ export default function ProductFilters({
 
     return (
         <div className="product-filters">
-            <select
-                value={category}
-                onChange={(e) =>
-                    setCategory(e.target.value)
-                }
-            >
-                <option value="">
-                    All categories
-                </option>
-
-                {categories.map((item) => (
-                    <option
-                        key={item.id}
-                        value={item.id}
-                    >
-                        {item.name}
-                    </option>
-                ))}
-            </select>
-
-            <select
-                value={sort}
-                onChange={(e) =>
-                    setSort(e.target.value)
-                }
-            >
-                <option value="latest">
-                    Latest
-                </option>
-
-                <option value="price_asc">
-                    Price: low to high
-                </option>
-
-                <option value="price_desc">
-                    Price: high to low
-                </option>
-            </select>
+            <div className="filter-heading"><span>FILTER / 01</span><strong>Refine your view</strong></div>
+            <label>Category
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                    <option value="">All categories</option>
+                    {categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+            </label>
+            <label>Sort by
+                <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                    <option value="latest">Latest arrivals</option>
+                    <option value="price_asc">Price: low to high</option>
+                    <option value="price_desc">Price: high to low</option>
+                </select>
+            </label>
         </div>
     );
 }

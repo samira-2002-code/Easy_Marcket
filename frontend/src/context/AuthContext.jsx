@@ -1,72 +1,73 @@
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
+import { AuthContext } from "./AuthContextValue";
 import * as authService from "../services/authService";
 
-const AuthContext = createContext(null);
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
+    const [user, setUser] = useState(() => {
+        const storedUser = localStorage.getItem("user");
 
-    try {
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
-  });
+        try {
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch {
+            return null;
+        }
+    });
 
-  const [token, setToken] = useState(
-    () => localStorage.getItem("token") || null
-  );
+    const [token, setToken] = useState(
+        () => localStorage.getItem("token") || null
+    );
 
-  const saveSession = (data) => {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    const saveSession = (data) => {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
 
-    setToken(data.token);
-    setUser(data.user);
-  };
+        setToken(data.token);
+        setUser(data.user);
+    };
 
-  const login = async (credentials) => {
-    const data = await authService.login(credentials);
-    saveSession(data);
-    return data;
-  };
+    const login = async (credentials) => {
+        const data = await authService.login(credentials);
 
-  const register = async (userData) => {
-    const data = await authService.register(userData);
-    return data;
-  };
+        saveSession(data);
 
-  const logout = async () => {
-    try {
-      await authService.logout();
-    } catch {
-      // Même si l'API échoue, on nettoie la session locale.
-    }
+        return data;
+    };
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    const register = async (userData) => {
+        const data = await authService.register(userData);
 
-    setToken(null);
-    setUser(null);
-  };
+        return data;
+    };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!token,
-        login,
-        register,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
+    const logout = async () => {
+        try {
+            await authService.logout();
+        } catch {
+            // Déconnexion locale même si l'API échoue
+        }
 
-export function useAuth() {
-  return useContext(AuthContext);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        setToken(null);
+        setUser(null);
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                token,
+                isAuthenticated: !!token,
+                login,
+                register,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 }

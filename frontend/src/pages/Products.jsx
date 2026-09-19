@@ -100,17 +100,12 @@ export default function Products() {
                                 DISCOVER SOMETHING NEW
                             </span>
 
-                            <h1>
-                                The
-                                <br />
-                                <em>marketplace.</em>
-                            </h1>
+                            <h1>Browse<br /><em>the market.</em></h1>
                         </div>
 
                         <div className="products-intro-side">
                             <p>
-                                Explore everything currently listed
-                                on Easy Market.
+                                A living index of useful things, good objects and local finds.
                             </p>
 
                             <Link to="/products/create">
@@ -121,28 +116,16 @@ export default function Products() {
                 </section>
 
                 <section className="products-content">
-                    <ProductFilters
-                        category={category}
-                        setCategory={setCategory}
-                        sort={sort}
-                        setSort={setSort}
-                    />
-
-                    <div className="products-result-info">
-                        <span>
-                            {loading
-                                ? "Loading..."
-                                : `${products.length} products`}
-                        </span>
-
-                        {!loading && (
-                            <span>
-                                {search
-                                    ? `Results for "${search}"`
-                                    : "All listings"}
-                            </span>
-                        )}
-                    </div>
+                    <div className="marketplace-layout">
+                        <aside className="marketplace-sidebar">
+                            <ProductFilters category={category} setCategory={setCategory} sort={sort} setSort={setSort} />
+                            <div className="sidebar-note"><span>NOTE / 02</span><p>Every listing is local. Ask a question, make an offer, or trade something of your own.</p></div>
+                        </aside>
+                        <div className="marketplace-results">
+                            <div className="products-result-info">
+                                <strong>{loading ? "Loading..." : `${products.length} listings`}</strong>
+                                <span>{search ? `Search / ${search}` : "All listings"}</span>
+                            </div>
 
                     {loading && (
                         <div className="products-empty">
@@ -166,6 +149,8 @@ export default function Products() {
                             onDelete={handleDelete}
                         />
                     )}
+                        </div>
+                    </div>
                 </section>
             </main>
         </div>

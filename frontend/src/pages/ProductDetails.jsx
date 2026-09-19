@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
     ArrowLeft,
     Heart,
-    MessageCircle,
     X,
     ArrowUpRight,
 } from "lucide-react";

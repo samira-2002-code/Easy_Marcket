@@ -8,7 +8,7 @@ import {
 import { Link } from "react-router-dom";
 
 import api from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import Navbar from "../components/home/Navbar";
 
 import "../components/home/home.css";
@@ -26,27 +26,35 @@ export default function Messages() {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        let cancelled = false;
+
+        const loadMessages = async () => {
+            try {
+                const response = await api.get("/messages");
+
+                if (!cancelled) {
+                    setMessages(response.data?.data || []);
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error("Messages error:", err);
+
+                if (!cancelled) {
+                    setError(
+                        err.response?.data?.message ||
+                            "Unable to load messages."
+                    );
+                    setLoading(false);
+                }
+            }
+        };
+
         loadMessages();
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
-
-    const loadMessages = async () => {
-        try {
-            setLoading(true);
-
-            const response = await api.get("/messages");
-
-            setMessages(response.data?.data || []);
-        } catch (err) {
-            console.error("Messages error:", err);
-
-            setError(
-                err.response?.data?.message ||
-                    "Unable to load messages."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
 
     /*
      * Création des conversations
@@ -102,11 +110,7 @@ export default function Messages() {
     const sendMessage = async (e) => {
         e.preventDefault();
 
-        if (
-            !text.trim() ||
-            !selected ||
-            sending
-        ) {
+        if (!text.trim() || !selected || sending) {
             return;
         }
 
@@ -228,6 +232,23 @@ export default function Messages() {
                     </Link>
                 </div>
 
+                {/* ERROR */}
+
+                {error && (
+                    <div
+                        style={{
+                            marginBottom: "20px",
+                            padding: "12px 16px",
+                            background: "#f8d7da",
+                            color: "#842029",
+                            fontSize: "13px",
+                            border: "1px solid #f1aeb5",
+                        }}
+                    >
+                        {error}
+                    </div>
+                )}
+
                 {/* MESSENGER */}
 
                 <div
@@ -253,8 +274,7 @@ export default function Messages() {
                             background: "#172019",
                             color: "#f3f0e8",
                             display: "flex",
-                            flexDirection:
-                                "column",
+                            flexDirection: "column",
                         }}
                     >
                         <div
@@ -278,27 +298,22 @@ export default function Messages() {
                             >
                                 <span
                                     style={{
-                                        fontSize:
-                                            "11px",
+                                        fontSize: "11px",
                                         letterSpacing:
                                             ".15em",
-                                        fontWeight:
-                                            "700",
+                                        fontWeight: "700",
                                     }}
                                 >
                                     MESSAGES
                                 </span>
 
-                                <MessageCircle
-                                    size={19}
-                                />
+                                <MessageCircle size={19} />
                             </div>
 
                             <div
                                 style={{
                                     display: "flex",
-                                    alignItems:
-                                        "center",
+                                    alignItems: "center",
                                     gap: "9px",
                                     background:
                                         "rgba(255,255,255,.08)",
@@ -315,8 +330,7 @@ export default function Messages() {
                                     value={search}
                                     onChange={(e) =>
                                         setSearch(
-                                            e.target
-                                                .value
+                                            e.target.value
                                         )
                                     }
                                     placeholder="Search..."
@@ -357,6 +371,24 @@ export default function Messages() {
                             )}
 
                             {!loading &&
+                                !error &&
+                                filteredConversations.length ===
+                                    0 && (
+                                    <div
+                                        style={{
+                                            padding:
+                                                "30px 20px",
+                                            opacity: ".6",
+                                            fontSize:
+                                                "13px",
+                                        }}
+                                    >
+                                        No conversations
+                                        found.
+                                    </div>
+                                )}
+
+                            {!loading &&
                                 filteredConversations.map(
                                     (
                                         conversation
@@ -393,8 +425,7 @@ export default function Messages() {
                                                         "12px",
                                                     padding:
                                                         "17px 18px",
-                                                    border:
-                                                        0,
+                                                    border: 0,
                                                     borderBottom:
                                                         "1px solid rgba(255,255,255,.07)",
                                                     background:
@@ -518,8 +549,7 @@ export default function Messages() {
                     <section
                         style={{
                             display: "flex",
-                            flexDirection:
-                                "column",
+                            flexDirection: "column",
                             minWidth: 0,
                             background:
                                 "#faf9f4",
@@ -555,7 +585,8 @@ export default function Messages() {
                                             "50%",
                                         background:
                                             "#d8e99e",
-                                        color: "#172019",
+                                        color:
+                                            "#172019",
                                         marginBottom:
                                             "18px",
                                     }}
@@ -599,8 +630,7 @@ export default function Messages() {
 
                                 <header
                                     style={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
                                         justifyContent:
                                             "space-between",
                                         alignItems:
@@ -849,8 +879,7 @@ export default function Messages() {
                                         value={text}
                                         onChange={(e) =>
                                             setText(
-                                                e.target
-                                                    .value
+                                                e.target.value
                                             )
                                         }
                                         placeholder="Write a message..."
@@ -893,9 +922,7 @@ export default function Messages() {
                                                 "pointer",
                                         }}
                                     >
-                                        <Send
-                                            size={18}
-                                        />
+                                        <Send size={18} />
                                     </button>
                                 </form>
                             </>
@@ -906,3 +933,4 @@ export default function Messages() {
         </div>
     );
 }
+

@@ -32,16 +32,8 @@ export default function CategoryList() {
       </div>
 
       <div className="categories-header">
-        <h2>
-          Browse by
-          <br />
-          <em>category.</em>
-        </h2>
-
-        <p>
-          Explore products by category and discover
-          something unexpected.
-        </p>
+        <h2>Explore <em>the everyday.</em></h2>
+        <p>From useful to unusual, follow your curiosity through the local marketplace.</p>
       </div>
 
       {loading ? (
@@ -66,10 +58,6 @@ export default function CategoryList() {
 
               <span className="category-name">
                 {category.name}
-              </span>
-
-              <span className="category-description">
-                Discover products
               </span>
 
               <span className="category-arrow">↗</span>

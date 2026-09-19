@@ -35,7 +35,7 @@ export default function Home() {
       <Navbar />
 
       <main>
-        <Hero />
+        <Hero product={products[0]} loading={loading} />
 
         <CategoryList />
 
@@ -124,9 +124,13 @@ export default function Home() {
       <footer className="market-footer">
         <div>
           <span className="footer-logo">EASY MARKET</span>
-          <p>Find. Connect. Trade.</p>
+          <p>Find. Save. Trade.</p>
         </div>
-
+        <nav>
+          <a href="/products">Marketplace</a>
+          <a href="/favorites">Saved</a>
+          <a href="/messages">Messages</a>
+        </nav>
         <span>© {new Date().getFullYear()} Easy Market</span>
       </footer>
     </div>
