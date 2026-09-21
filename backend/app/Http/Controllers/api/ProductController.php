@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -54,6 +55,10 @@ class ProductController extends Controller
             );
         }
 
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
         // Tri
         $sort = $request->get('sort', 'latest');
 
@@ -80,6 +85,19 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => $products
+        ]);
+    }
+
+    public function mine(Request $request)
+    {
+        $products = Product::with(['category', 'user'])
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $products,
         ]);
     }
 
@@ -151,8 +169,20 @@ class ProductController extends Controller
                 'required',
                 Rule::in(['sale', 'exchange']),
             ],
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            $validated['image'] = $request
+                ->file('image')
+                ->store('products', 'public');
+        } else {
+            unset($validated['image']);
+        }
 
         $product->update($validated);
 

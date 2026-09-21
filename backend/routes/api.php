@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\ReportController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -42,10 +44,12 @@ Route::get('/images/{image}', [ImageController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
 
     // Products
+    Route::get('/my-products', [ProductController::class, 'mine']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::patch('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    Route::post('/products/{product}/report', [ReportController::class, 'store']);
 
     // Images
     Route::post('/images', [ImageController::class, 'store']);
@@ -66,4 +70,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages', [MessageController::class, 'index']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/{message}', [MessageController::class, 'show']);
+});
+
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/stats', [AdminController::class, 'stats']);
+    Route::get('/users', [AdminController::class, 'users']);
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
+    Route::get('/products', [AdminController::class, 'products']);
+    Route::delete('/products/{product}', [AdminController::class, 'destroyProduct']);
+    Route::get('/reports', [AdminController::class, 'reports']);
+    Route::patch('/reports/{report}', [AdminController::class, 'updateReport']);
 });

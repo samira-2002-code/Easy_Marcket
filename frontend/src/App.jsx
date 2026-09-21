@@ -12,6 +12,9 @@ import ProductDetails from "./pages/ProductDetails";
 import Messages from "./pages/Messages";
 import Favorites from "./pages/Favorites";
 import Categories from "./pages/Categories";
+import Dashboard from "./pages/Dashboard";
+import EditProduct from "./pages/EditProduct";
+import Admin from "./pages/Admin";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -70,10 +73,37 @@ function AppRoutes() {
       />
 
       <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <Admin />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/products/:id"
         element={
           <ProtectedRoute>
             <ProductDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products/:id/edit"
+        element={
+          <ProtectedRoute>
+            <EditProduct />
           </ProtectedRoute>
         }
       />

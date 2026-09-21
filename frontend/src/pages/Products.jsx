@@ -12,6 +12,9 @@ import "../components/products/products.css";
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState("");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+    const [type, setType] = useState("");
     const [sort, setSort] = useState("latest");
 
     const [loading, setLoading] = useState(true);
@@ -40,6 +43,10 @@ export default function Products() {
                 if (sort) {
                     params.sort = sort;
                 }
+
+                if (minPrice) params.min_price = minPrice;
+                if (maxPrice) params.max_price = maxPrice;
+                if (type) params.type = type;
 
                 const response = await api.get("/products", {
                     params,
@@ -73,7 +80,7 @@ export default function Products() {
         };
 
         fetchProducts();
-    }, [search, category, sort]);
+    }, [search, category, minPrice, maxPrice, type, sort]);
 
     const handleDelete = (productId) => {
         setProducts((currentProducts) =>
@@ -118,7 +125,7 @@ export default function Products() {
                 <section className="products-content">
                     <div className="marketplace-layout">
                         <aside className="marketplace-sidebar">
-                            <ProductFilters category={category} setCategory={setCategory} sort={sort} setSort={setSort} />
+                            <ProductFilters category={category} setCategory={setCategory} minPrice={minPrice} setMinPrice={setMinPrice} maxPrice={maxPrice} setMaxPrice={setMaxPrice} type={type} setType={setType} sort={sort} setSort={setSort} />
                             <div className="sidebar-note"><span>NOTE / 02</span><p>Every listing is local. Ask a question, make an offer, or trade something of your own.</p></div>
                         </aside>
                         <div className="marketplace-results">

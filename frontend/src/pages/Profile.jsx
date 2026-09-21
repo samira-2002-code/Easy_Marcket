@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Save, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/useAuth";
 
 import Navbar from "../components/home/Navbar";
 import "../components/home/home.css";
 import "../components/profile/profile.css";
 
 export default function Profile() {
+    const { setUser } = useAuth();
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -74,6 +76,7 @@ export default function Profile() {
                 response.data;
 
             localStorage.setItem("user", JSON.stringify(updatedUser));
+            setUser(updatedUser);
 
             setForm({
                 name: updatedUser.name || "",

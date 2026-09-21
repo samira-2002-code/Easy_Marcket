@@ -1,0 +1,26 @@
+.dashboard-page { padding-bottom: 90px; }
+.dashboard-intro, .dashboard-content { padding-left: 8%; padding-right: 8%; }
+.dashboard-intro { padding-top: 70px; padding-bottom: 55px; }
+.dashboard-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-top: 40px; }
+.dashboard-eyebrow { color: var(--warm); font: 500 9px "DM Mono", monospace; letter-spacing: .15em; }
+.dashboard-heading h1 { margin: 18px 0 0; font: 700 clamp(54px, 8vw, 110px)/.82 "Space Grotesk", sans-serif; letter-spacing: -.08em; }
+.dashboard-heading h1 em { color: var(--warm); font-style: italic; font-weight: 400; }
+.dashboard-heading p { max-width: 280px; margin: 0 0 4px; color: var(--muted); font: 400 12px/1.7 "Manrope", sans-serif; }
+.dashboard-actions { display: flex; flex-wrap: wrap; gap: 12px; padding-bottom: 35px; border-bottom: 1px solid var(--line); }
+.dashboard-actions a, .dashboard-listings-header > a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; border: 1px solid var(--line); padding: 12px 15px; font: 600 10px "DM Mono", monospace; }
+.dashboard-listings-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 35px 0 20px; }
+.dashboard-listings-header div { display: flex; align-items: baseline; gap: 14px; }
+.dashboard-listings-header span { color: var(--warm); font: 500 9px "DM Mono", monospace; }
+.dashboard-listings-header h2 { margin: 0; font: 600 27px "Space Grotesk", sans-serif; }
+.dashboard-listings-header > a { border: 0; border-bottom: 1px solid var(--ink); padding: 0 0 5px; }
+.dashboard-listings { border-top: 1px solid var(--line); }
+.dashboard-listing { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.dashboard-listing > div:first-child span { color: var(--warm); font: 500 8px "DM Mono", monospace; text-transform: uppercase; }
+.dashboard-listing h3 { margin: 7px 0 5px; font: 600 21px "Space Grotesk", sans-serif; }
+.dashboard-listing p { margin: 0; color: var(--muted); font: 500 10px "DM Mono", monospace; }
+.dashboard-listing-actions { display: flex; align-items: center; gap: 14px; }
+.dashboard-listing-actions a, .dashboard-listing-actions button { color: var(--ink); background: none; border: 0; text-decoration: none; cursor: pointer; }
+.dashboard-listing-actions a:first-child { font: 600 10px "DM Mono", monospace; border-bottom: 1px solid var(--ink); padding-bottom: 4px; }
+.dashboard-state, .dashboard-error { padding: 42px 0; color: var(--muted); font: 500 11px "DM Mono", monospace; border-top: 1px solid var(--line); }
+.dashboard-error { color: #a33f32; }
+@media (max-width: 700px) { .dashboard-heading { display: block; } .dashboard-heading p { margin-top: 28px; } .dashboard-listing { align-items: flex-start; } .dashboard-listing-actions { gap: 10px; } }

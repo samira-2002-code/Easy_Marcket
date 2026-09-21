@@ -101,6 +101,16 @@ export default function Navbar() {
                         </span>
                     </Link>
 
+                    <Link to="/dashboard" className="profile-link">
+                        Dashboard
+                    </Link>
+
+                    {user?.role === "admin" && (
+                        <Link to="/admin" className="profile-link">
+                            Admin
+                        </Link>
+                    )}
+
                     <button
                         type="button"
                         className="logout-button"

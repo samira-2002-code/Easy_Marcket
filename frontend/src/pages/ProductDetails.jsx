@@ -29,6 +29,7 @@ export default function ProductDetails() {
 
     const [message, setMessage] = useState("");
     const [messageLoading, setMessageLoading] = useState(false);
+    const [reporting, setReporting] = useState(false);
 
     /*
      * ---------------------------------------------------------
@@ -181,13 +182,6 @@ export default function ProductDetails() {
         seller?.city ||
         "Local seller";
 
-    const sellerId =
-        product?.user_id ||
-        product?.user?.id ||
-        product?.seller_id ||
-        product?.seller?.id ||
-        null;
-
     /*
      * ---------------------------------------------------------
      * PRODUCT INFO
@@ -292,20 +286,12 @@ export default function ProductDetails() {
             return;
         }
 
-        if (!sellerId) {
-            alert(
-                "Impossible de contacter le vendeur : son identifiant est introuvable."
-            );
-            return;
-        }
-
         try {
             setMessageLoading(true);
 
             await api.post("/messages", {
                 product_id: product.id,
-                receiver_id: sellerId,
-                content: message.trim(),
+                message: message.trim(),
             });
 
             setMessage("");
@@ -314,12 +300,33 @@ export default function ProductDetails() {
         } catch (err) {
             console.error("Send message error:", err);
 
+            const validationErrors = err.response?.data?.errors;
+            const validationMessage = validationErrors
+                ? Object.values(validationErrors).flat().join(" ")
+                : "";
+
             alert(
-                err.response?.data?.message ||
+                validationMessage ||
+                    err.response?.data?.message ||
                     "Impossible d'envoyer le message."
             );
         } finally {
             setMessageLoading(false);
+        }
+    };
+
+    const handleReport = async () => {
+        const reason = window.prompt("Why are you reporting this listing?");
+        if (!reason?.trim() || reporting) return;
+
+        try {
+            setReporting(true);
+            await api.post(`/products/${product.id}/report`, { reason: reason.trim() });
+            alert("Thank you. The listing has been reported.");
+        } catch (err) {
+            alert(err.response?.data?.message || "Unable to report this listing.");
+        } finally {
+            setReporting(false);
         }
     };
 
@@ -726,6 +733,10 @@ export default function ProductDetails() {
                                 Market messaging.
                             </span>
                         </div>
+
+                        <button type="button" className="product-details-report" onClick={handleReport} disabled={reporting}>
+                            {reporting ? "REPORTING..." : "REPORT THIS LISTING"}
+                        </button>
                     </div>
                 </section>
 
