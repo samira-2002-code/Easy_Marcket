@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Product;
 use App\Models\Favorite;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasMany as HasManyRelation;
 
 #[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
@@ -36,5 +37,10 @@ class User extends Authenticatable
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    public function notifications(): HasManyRelation
+    {
+        return $this->hasMany(Notification::class);
     }
 }

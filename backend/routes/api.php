@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\NotificationController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -70,6 +71,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages', [MessageController::class, 'index']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/{message}', [MessageController::class, 'show']);
+
+    // Notifications privées de l'utilisateur connecté
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
