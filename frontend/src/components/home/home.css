@@ -151,6 +151,20 @@ body {
     flex-shrink: 0;
 }
 
+.notification-nav-link {
+    position: relative;
+}
+
+.notification-nav-link strong,
+.mobile-navigation a strong {
+    min-width: 16px;
+    padding: 2px 4px;
+    color: var(--paper);
+    background: var(--warm);
+    font: 600 8px "DM Mono", monospace;
+    text-align: center;
+}
+
 /* Account */
 
 .navbar-account {

@@ -15,6 +15,7 @@ import Categories from "./pages/Categories";
 import Dashboard from "./pages/Dashboard";
 import EditProduct from "./pages/EditProduct";
 import Admin from "./pages/Admin";
+import Notifications from "./pages/Notifications";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -113,6 +114,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Messages />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         }
       />

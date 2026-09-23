@@ -3,10 +3,13 @@ import {
     LogOut,
     Menu,
     MessageCircle,
+    Bell,
     Search,
     X,
 } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
+import api from "../../services/api";
 import {
     Link,
     useNavigate,
@@ -24,6 +27,25 @@ export default function Navbar() {
     );
 
     const [menuOpen, setMenuOpen] = useState(false);
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        api.get("/notifications")
+            .then((response) => {
+                if (!cancelled) {
+                    setUnreadNotifications(response.data?.unread_count || 0);
+                }
+            })
+            .catch(() => {
+                if (!cancelled) setUnreadNotifications(0);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -86,6 +108,12 @@ export default function Navbar() {
                     <Link to="/messages" className="nav-icon-link">
                         <MessageCircle size={16} />
                         <span>Messages</span>
+                    </Link>
+
+                    <Link to="/notifications" className="nav-icon-link notification-nav-link">
+                        <Bell size={16} />
+                        <span>Notifications</span>
+                        {unreadNotifications > 0 && <strong>{unreadNotifications}</strong>}
                     </Link>
                 </nav>
 
@@ -197,6 +225,12 @@ export default function Navbar() {
                     <Link to="/messages" onClick={closeMenu}>
                         <MessageCircle size={17} />
                         Messages
+                    </Link>
+
+                    <Link to="/notifications" onClick={closeMenu}>
+                        <Bell size={17} />
+                        Notifications
+                        {unreadNotifications > 0 && <strong>{unreadNotifications}</strong>}
                     </Link>
 
                     <Link to="/profile" onClick={closeMenu}>

@@ -1,0 +1,12 @@
+.notifications-page { padding-bottom: 90px; }
+.notification-list { border-top: 1px solid var(--line); }
+.notification-item { display: flex; align-items: center; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.notification-item.is-unread { background: rgba(101, 118, 77, .06); }
+.notification-icon { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; color: var(--warm); border: 1px solid var(--line); }
+.notification-copy { min-width: 0; flex: 1; }
+.notification-copy span { color: var(--warm); font: 500 8px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .1em; }
+.notification-copy p { margin: 6px 0; color: var(--ink); font: 500 13px/1.5 "Manrope", sans-serif; }
+.notification-copy small { color: var(--muted); font: 500 9px "DM Mono", monospace; }
+.notification-item > button { display: grid; place-items: center; width: 34px; height: 34px; color: var(--ink); background: transparent; border: 1px solid var(--line); cursor: pointer; }
+.notification-item > button:hover { color: var(--warm); border-color: var(--warm); }
+@media (max-width: 600px) { .notification-item { align-items: flex-start; } .notification-copy p { font-size: 12px; } }
