@@ -90,7 +90,7 @@ export default function ProductDetails() {
                     setIsFavorite(false);
                     setFavoriteId(null);
                 }
-            } catch (err) {
+            } catch {
                 /*
                  * L'utilisateur peut ne pas être connecté.
                  * On ne bloque pas l'affichage de la page.
@@ -145,6 +145,8 @@ export default function ProductDetails() {
      */
     useEffect(() => {
         if (activeImage >= images.length && images.length > 0) {
+            // Keep the carousel index valid when the loaded image list changes.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setActiveImage(0);
         }
     }, [images, activeImage]);

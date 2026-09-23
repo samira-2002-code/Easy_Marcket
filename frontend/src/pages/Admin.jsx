@@ -27,7 +27,7 @@ export default function Admin() {
         }
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { void Promise.resolve().then(load); }, []);
 
     const deleteUser = async (id) => {
         if (!window.confirm("Delete this user and their data?")) return;
@@ -39,5 +39,35 @@ export default function Admin() {
         try { await api.delete(`/admin/products/${id}`); setProducts((items) => items.filter((item) => item.id !== id)); } catch (err) { setError(err.response?.data?.message || "Unable to remove listing."); }
     };
 
-    return <div className="market-home"><Navbar /><main className="dashboard-page"><section className="dashboard-intro"><div className="section-topline"><span>00</span><span>ADMINISTRATION</span></div><div className="dashboard-heading"><div><span className="dashboard-eyebrow">CONTROL ROOM</span><h1>Market<br /><em>admin.</em></h1></div><p>Keep the marketplace healthy with a focused view of its core activity.</p></div></section><section className="dashboard-content">{error && <div className="dashboard-error">{error}</div>}<div className="dashboard-actions">{Object.entries(stats).map(([key, value]) => <span key={key} className="dashboard-actions a"><strong>{value}</strong> {key}</span>)}</div><div className="dashboard-listings-header"><div><span>01</span><h2>Users</h2></div></div><div className="dashboard-listings">{users.map((user) => <article className="dashboard-listing" key={user.id}><div><span>{user.role}</span><h3>{user.name}</h3><p>{user.email}</p></div><div className="dashboard-listing-actions"><button type="button" onClick={() => deleteUser(user.id)} aria-label={`Delete ${user.name}`}><Trash2 size={16} /></button></div></article>)}</div><div className="dashboard-listings-header"><div><span>02</span><h2>Listings</h2></div></div><div className="dashboard-listings">{products.map((product) => <article className="dashboard-listing" key={product.id}><div><span>{product.user?.name || "User"} / {product.category?.name || "Marketplace"}</span><h3>{product.title}</h3><p>{product.type === "exchange" ? "Exchange" : `${Number(product.price).toLocaleString("fr-FR")} DH`}</p></div><div className="dashboard-listing-actions"><Link to={`/products/${product.id}`}>View</Link><button type="button" onClick={() => deleteProduct(product.id)} aria-label={`Delete ${product.title}`}><Trash2 size={16} /></button></div></article>)}</div><div className="dashboard-listings-header"><div><span>03</span><h2>Reports</h2></div></div><div className="dashboard-listings">{reports.length ? reports.map((report) => <article className="dashboard-listing" key={report.id}><div><span>{report.status}</span><h3>{report.product?.title || "Removed listing"}</h3><p>{report.reason} / {report.user?.name || "User"}</p></div></article>) : <div className="dashboard-state">No reports.</div>}</div></section></main></div>;
+    const updateReportStatus = async (reportId, status) => {
+        try {
+            const response = await api.patch(`/admin/reports/${reportId}`, { status });
+            const updatedReport = response.data?.data || {};
+            setReports((items) => items.map((item) => item.id === reportId ? { ...item, ...updatedReport, status } : item));
+        } catch (err) {
+            setError(err.response?.data?.message || "Unable to update report status.");
+        }
+    };
+
+    return (
+        <div className="market-home">
+            <Navbar />
+            <main className="dashboard-page">
+                <section className="dashboard-intro">
+                    <div className="section-topline"><span>00</span><span>ADMINISTRATION</span></div>
+                    <div className="dashboard-heading"><div><span className="dashboard-eyebrow">CONTROL ROOM</span><h1>Market<br /><em>admin.</em></h1></div><p>Keep the marketplace healthy with a focused view of its core activity.</p></div>
+                </section>
+                <section className="dashboard-content">
+                    {error && <div className="dashboard-error">{error}</div>}
+                    <div className="dashboard-actions">{Object.entries(stats).map(([key, value]) => <span key={key} className="dashboard-actions a"><strong>{value}</strong> {key}</span>)}</div>
+                    <div className="dashboard-listings-header"><div><span>01</span><h2>Users</h2></div></div>
+                    <div className="dashboard-listings">{users.map((user) => <article className="dashboard-listing" key={user.id}><div><span>{user.role}</span><h3>{user.name}</h3><p>{user.email}</p></div><div className="dashboard-listing-actions"><button type="button" onClick={() => deleteUser(user.id)} aria-label={`Delete ${user.name}`}><Trash2 size={16} /></button></div></article>)}</div>
+                    <div className="dashboard-listings-header"><div><span>02</span><h2>Listings</h2></div></div>
+                    <div className="dashboard-listings">{products.map((product) => <article className="dashboard-listing" key={product.id}><div><span>{product.user?.name || "User"} / {product.category?.name || "Marketplace"}</span><h3>{product.title}</h3><p>{product.type === "exchange" ? "Exchange" : `${Number(product.price).toLocaleString("fr-FR")} DH`}</p></div><div className="dashboard-listing-actions"><Link to={`/products/${product.id}`}>View</Link><button type="button" onClick={() => deleteProduct(product.id)} aria-label={`Delete ${product.title}`}><Trash2 size={16} /></button></div></article>)}</div>
+                    <div className="dashboard-listings-header"><div><span>03</span><h2>Reports</h2></div></div>
+                    <div className="dashboard-listings">{reports.length ? reports.map((report) => <article className="dashboard-listing" key={report.id}><div><span>{report.status}</span><h3>{report.product?.title || "Removed listing"}</h3><p>{report.reason} / {report.user?.name || "User"}</p></div><div className="dashboard-listing-actions"><select value={report.status} onChange={(event) => updateReportStatus(report.id, event.target.value)} aria-label={`Update report ${report.id} status`}><option value="pending">Pending</option><option value="reviewed">Reviewed</option><option value="resolved">Resolved</option></select></div></article>) : <div className="dashboard-state">No reports.</div>}</div>
+                </section>
+            </main>
+        </div>
+    );
 }
