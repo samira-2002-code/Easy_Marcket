@@ -64,9 +64,13 @@ export default function Messages() {
 
         messages.forEach((message) => {
             const otherUser =
-                message.sender_id === user?.id
+                String(message.sender_id) === String(user?.id)
                     ? message.receiver
                     : message.sender;
+
+            if (!otherUser?.id || !message.product_id) {
+                return;
+            }
 
             const key = `${otherUser?.id}-${message.product_id}`;
 
@@ -119,6 +123,7 @@ export default function Messages() {
 
             const response = await api.post("/messages", {
                 product_id: selected.product.id,
+                receiver_id: selected.user.id,
                 message: text.trim(),
             });
 

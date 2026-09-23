@@ -40,7 +40,15 @@ export default function EditProduct() {
     const handleImageChange = (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+            setImage(null);
+            setPreview("");
+            setError("The image must be smaller than 10 MB.");
+            event.target.value = "";
+            return;
+        }
         setImage(file);
+        setError("");
         setPreview(URL.createObjectURL(file));
     };
 

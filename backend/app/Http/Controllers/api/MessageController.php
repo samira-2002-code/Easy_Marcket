@@ -33,14 +33,73 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
+        /*
+         * Support both:
+         * - message : new frontend format
+         * - content : old frontend format
+         */
+        if (!$request->filled('message') && $request->filled('content')) {
+            $request->merge([
+                'message' => $request->input('content'),
+            ]);
+        }
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'message' => 'required|string|max:2000',
+            'receiver_id' => 'nullable|exists:users,id',
         ]);
+
+        $userId = $request->user()->id;
 
         $product = Product::findOrFail($validated['product_id']);
 
-        if ($product->user_id === $request->user()->id) {
+        /*
+         * First message:
+         * receiver = product owner.
+         *
+         * Reply:
+         * receiver_id is provided by the frontend.
+         */
+        if (!empty($validated['receiver_id'])) {
+            $receiverId = (int) $validated['receiver_id'];
+
+            /*
+             * The receiver must be part of an existing
+             * conversation about this product.
+             */
+            $conversationExists = Message::where('product_id', $product->id)
+                ->where(function ($query) use ($userId, $receiverId) {
+                    $query
+                        ->where(function ($q) use ($userId, $receiverId) {
+                            $q->where('sender_id', $userId)
+                                ->where('receiver_id', $receiverId);
+                        })
+                        ->orWhere(function ($q) use ($userId, $receiverId) {
+                            $q->where('sender_id', $receiverId)
+                                ->where('receiver_id', $userId);
+                        });
+                })
+                ->exists();
+
+            if (!$conversationExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette conversation n’existe pas.',
+                ], 403);
+            }
+        } else {
+            /*
+             * New conversation:
+             * automatically contact the seller.
+             */
+            $receiverId = $product->user_id;
+        }
+
+        /*
+         * Prevent self-contact.
+         */
+        if ($receiverId === $userId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vous ne pouvez pas vous contacter vous-même.',
@@ -48,8 +107,8 @@ class MessageController extends Controller
         }
 
         $message = Message::create([
-            'sender_id' => $request->user()->id,
-            'receiver_id' => $product->user_id,
+            'sender_id' => $userId,
+            'receiver_id' => $receiverId,
             'product_id' => $product->id,
             'message' => $validated['message'],
         ]);

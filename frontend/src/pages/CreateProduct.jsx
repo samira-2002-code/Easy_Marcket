@@ -64,7 +64,16 @@ export default function CreateProduct() {
             return;
         }
 
+        if (file.size > 10 * 1024 * 1024) {
+            setImage(null);
+            setPreview("");
+            setError("The image must be smaller than 10 MB.");
+            e.target.value = "";
+            return;
+        }
+
         setImage(file);
+        setError("");
         setPreview(URL.createObjectURL(file));
     };
 
@@ -102,6 +111,11 @@ export default function CreateProduct() {
                     firstError || "Please check the information entered."
                 );
             } else {
+                if (err.response?.status === 413) {
+                    setError("The uploaded image is too large. Choose an image smaller than 10 MB.");
+                    return;
+                }
+
                 setError(
                     err.response?.data?.message ||
                     "Unable to create the product."

@@ -23,7 +23,7 @@ class ImageController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $product = \App\Models\Product::findOrFail($validated['product_id']);
@@ -70,7 +70,7 @@ class ImageController extends Controller
 
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $newProduct = \App\Models\Product::findOrFail($validated['product_id']);

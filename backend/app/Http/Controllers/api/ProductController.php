@@ -112,7 +112,7 @@ class ProductController extends Controller
                 'required',
                 Rule::in(['sale', 'exchange']),
             ],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $validated['user_id'] = $request->user()->id;
@@ -169,7 +169,7 @@ class ProductController extends Controller
                 'required',
                 Rule::in(['sale', 'exchange']),
             ],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         if ($request->hasFile('image')) {
