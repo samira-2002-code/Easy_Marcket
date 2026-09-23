@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -111,6 +112,12 @@ class MessageController extends Controller
             'receiver_id' => $receiverId,
             'product_id' => $product->id,
             'message' => $validated['message'],
+        ]);
+
+        Notification::create([
+            'user_id' => $receiverId,
+            'type' => 'message',
+            'message' => 'Vous avez reçu un nouveau message concernant votre produit.',
         ]);
 
         return response()->json([

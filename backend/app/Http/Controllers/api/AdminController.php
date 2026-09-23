@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Message;
 use App\Models\Product;
 use App\Models\Report;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -53,7 +54,17 @@ class AdminController extends Controller
     public function updateReport(Request $request, Report $report)
     {
         $validated = $request->validate(['status' => 'required|in:pending,reviewed,resolved']);
+        $wasResolved = $report->status === 'resolved';
         $report->update($validated);
+
+        if (!$wasResolved && $validated['status'] === 'resolved' && $report->product) {
+            Notification::create([
+                'user_id' => $report->product->user_id,
+                'type' => 'report_resolved',
+                'message' => 'Un signalement concernant votre produit a été traité par un administrateur.',
+            ]);
+        }
+
         return response()->json(['success' => true, 'data' => $report]);
     }
 }
