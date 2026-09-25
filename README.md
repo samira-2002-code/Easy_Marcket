@@ -2,7 +2,7 @@
 
 **Easy Market** est une marketplace web développée dans le cadre de mon **projet fil rouge**.
 
-L'idée est simple : permettre à un utilisateur de mettre un objet en vente ou de proposer un échange, puis permettre aux autres utilisateurs de rechercher les annonces, les filtrer et consulter leurs détails.
+L'idée est simple : permettre à un utilisateur de mettre un objet en vente ou de proposer un échange, puis permettre aux autres utilisateurs de rechercher les annonces, les filtres et de consulter leurs détails.
 
 Le projet est construit avec une séparation claire entre un **backend Laravel qui expose une API REST** et un **frontend React qui consomme cette API**.
 
@@ -20,7 +20,7 @@ ou :
 
 Chaque annonce appartient à un utilisateur et à une catégorie.
 
-L'utilisateur peut ensuite retrouver ses annonces, les modifier ou les supprimer.
+L'utilisateur peut ensuite retrouver ses annonces, les modifier et ou les supprimer.
 
 ---
 
